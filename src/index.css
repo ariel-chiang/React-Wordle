@@ -111,6 +111,16 @@ h1 {
   text-transform: uppercase;
   letter-spacing: 1px;
 }
+.replay {
+  background-color: green;
+  border: none;
+  color: #fff;
+  padding: 12px 24px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
 
 /* keyframe animations */
 @keyframes flip {

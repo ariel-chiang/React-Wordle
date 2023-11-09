@@ -1,6 +1,9 @@
 import React from 'react'
 
 export default function Modal({ isCorrect, turn, solution }) {
+  function refreshPage() {
+    window.location.reload(false)
+  }
   return (
     <div className="modal">
       {isCorrect && (
@@ -8,6 +11,7 @@ export default function Modal({ isCorrect, turn, solution }) {
           <h1>You Win!</h1>
           <p className='solution'>{solution}</p>
           <p>You found the solution in {turn} guesses :)</p>
+          <button className='replay' onClick={refreshPage}>Play Again</button>
         </div>
       )}
       {!isCorrect && (
@@ -15,6 +19,7 @@ export default function Modal({ isCorrect, turn, solution }) {
           <h1>Never mind!</h1>
           <p className='solution'>{solution}</p>
           <p>Better luck next time :)</p>
+          <button className='replay' onClick={refreshPage}>Play Again</button>
         </div>
       )}
     </div>
