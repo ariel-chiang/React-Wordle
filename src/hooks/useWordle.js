@@ -75,6 +75,40 @@ const useWordle = (solution, allSolutions, gameMode) => {
     setCurrentGuess('')
   }
 
+  // check if a word is possible given history
+  const possibleGuess = (word) => {
+    return guesses.slice(0, turn).every((guess) => {
+      let wordArray = word.split('')
+      return guess.every((l, i) => {
+        if (l.color === 'green') {
+          if (word[i] !== l.key) {
+            console.log('word does not include a known green character')
+            return false
+          }
+          wordArray[i] = null
+        }
+        if (l.color === 'yellow') {
+          if (word[i] === l.key) {
+            console.log('a known yellow character is misplaced again')
+            return false
+          }
+          if (!wordArray.includes(l.key)) {
+            console.log('word does not include a known yellow character')
+            return false
+          }
+          wordArray[wordArray.indexOf(l.key)] = null
+        }
+        return true
+      }) && guess.every((l, i) => {
+        if (l.color === 'grey' && wordArray.includes(l.key)) {
+          console.log('word includes impossible character')
+          return false
+        }
+        return true
+      })
+    })
+  }
+
   // handle keyup event & track current guess
   // if user presses enter, add the new guess
   const handleKeyup = ({ key }) => {
@@ -100,43 +134,10 @@ const useWordle = (solution, allSolutions, gameMode) => {
         console.log('word does not exist in database')
         return
       }
-      // if game mode is more restricted, check if word contradicts with history
-      if (gameMode === 'more restricted' && turn > 0) {
-        let currentGuessArray = currentGuess.split('')
-        let violation = false
-
-        const passRestriction = guesses.slice(0, turn).every((guess) => {
-          return guess.every((l, i) => {
-            if (l.color === 'grey' && currentGuessArray.includes(l.key)) {
-              console.log('word includes impossible character')
-              violation = true
-              return false
-            }
-            if (l.color === 'green' && currentGuess[i] !== l.key) {
-              console.log('word does not include a known green character')
-              violation = true
-              return false
-            }
-            if (l.color === 'yellow') {
-              if (currentGuess[i] === l.key) {
-                console.log('a known yellow character is misplaced again')
-                violation = true
-                return false
-              }
-              if (!currentGuessArray.includes(l.key)) {
-                console.log('word does not include a known yellow character')
-                violation = true
-                return false
-              }
-              currentGuessArray[currentGuessArray.indexOf(l.key)] = null
-            }
-            return true
-          })
-        })
-
-        if (!passRestriction) {
-          return
-        }
+      // if game mode is more restricted, check if word contradicts history
+      if (gameMode === 'more restricted' && !possibleGuess(currentGuess)) {
+        console.log('word is impossible given history')
+        return
       }
       const formatted = formatGuess()
       addNewGuess(formatted)

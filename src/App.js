@@ -16,8 +16,7 @@ function App() {
   useEffect(() => {
     // random int between 0 & 2309
     const randomInt = Math.floor(Math.random()*allSolutions.length)
-    // setSolution(allSolutions[randomInt])
-    setSolution('poise')
+    setSolution(allSolutions[randomInt])
   }, [allSolutions])
 
   return (
