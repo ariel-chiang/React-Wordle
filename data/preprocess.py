@@ -17,5 +17,5 @@ data["letters"] = []
 for i in range(ord('a'), ord('z')+1):
   data["letters"].append({"key": chr(i)})
 
-with open('db.json', 'w') as f:
+with open('../public/db.json', 'w') as f:
   json.dump(data, f)
