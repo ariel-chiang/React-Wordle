@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-const useWordle = (solution) => {
+const useWordle = (solution, allSolutions, gameMode) => {
   const [turn, setTurn] = useState(0)
   const [currentGuess, setCurrentGuess] = useState('')
   const [guesses, setGuesses] = useState([...Array(6)]) // each guess is an array
@@ -94,6 +94,49 @@ const useWordle = (solution) => {
       if (currentGuess.length !== 5) {
         console.log('word must be 5 chars long')
         return
+      }
+      // if game mode is restricted, check if word is in dictionary
+      if (gameMode !== 'free' && !allSolutions.includes(currentGuess)) {
+        console.log('word does not exist in database')
+        return
+      }
+      // if game mode is more restricted, check if word contradicts with history
+      if (gameMode === 'more restricted' && turn > 0) {
+        let currentGuessArray = currentGuess.split('')
+        let violation = false
+
+        const passRestriction = guesses.slice(0, turn).every((guess) => {
+          return guess.every((l, i) => {
+            if (l.color === 'grey' && currentGuessArray.includes(l.key)) {
+              console.log('word includes impossible character')
+              violation = true
+              return false
+            }
+            if (l.color === 'green' && currentGuess[i] !== l.key) {
+              console.log('word does not include a known green character')
+              violation = true
+              return false
+            }
+            if (l.color === 'yellow') {
+              if (currentGuess[i] === l.key) {
+                console.log('a known yellow character is misplaced again')
+                violation = true
+                return false
+              }
+              if (!currentGuessArray.includes(l.key)) {
+                console.log('word does not include a known yellow character')
+                violation = true
+                return false
+              }
+              currentGuessArray[currentGuessArray.indexOf(l.key)] = null
+            }
+            return true
+          })
+        })
+
+        if (!passRestriction) {
+          return
+        }
       }
       const formatted = formatGuess()
       addNewGuess(formatted)
